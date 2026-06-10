@@ -1,130 +1,130 @@
 package com.antik.crc32;
 
+import static com.antik.crc32.Casting.unsignedInt;
+
+import com.antik.crc32.hyper.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Iterator;
 
-public class crc32 {
-    public static void patch(File s_a, File t_a) throws IOException {
-        
-        Map<String, long[]> s_es = new LinkedHashMap<String, long[]>();
-        Map<String, long[]> t_es = new LinkedHashMap<String, long[]>();
+/**
+ * Created by aantik
+ * 3/16/2026 9:00 PM
+ *
+ *   ⋆    ႔ ႔
+ *     ᠸ^ ^ ⸝⸝
+ *       |、˜〵
+ *      じしˍ,)⁐̤ᐷ
+ *
+ * Fox Mode 🍺
+ */
 
-        File[] f_ls = {s_a, t_a};
-        
-        for (int i = 0; i < 2; i++) {
-            File f = f_ls[i];
-            Map<String, long[]> cur = (i == 0) ? s_es : t_es;
+public class crc32  extends  JVMCasting {
 
-            try (RandomAccessFile rf = new RandomAccessFile(f, "r")) {
-                FileChannel ch = rf.getChannel();
-                long sz = ch.size();
-                int t_sz = (int) Math.min(65558L, sz);
-                ByteBuffer t_bf = ByteBuffer.allocate(t_sz).order(ByteOrder.LITTLE_ENDIAN);
-                ch.read(t_bf, sz - t_sz);
-                t_bf.flip();
+    public static Map<String, long[]> readDexCrcInfo(File apkFile) throws IOException {
+        Map<String, long[]> dexInfoMap = new LinkedHashMap<String, long[]>();
+        RandomAccessFile file = new RandomAccessFile(apkFile, "r");
 
-                Long eo = null;
-                for (int j = t_bf.limit() - 4; j >= 0; j--) {
-                    if (t_bf.getInt(j) == 0x06054b50) {
-                        eo = (sz - t_sz) + (long)j;
-                        break;
-                    }
-                }
-                
-                if (eo != null) {
-                    ByteBuffer eb = ByteBuffer.allocate(22).order(ByteOrder.LITTLE_ENDIAN);
-                    ch.read(eb, eo);
-                    eb.flip();
-                    long cds = eb.getInt(12) & 0xFFFFFFFFL;
-                    long cdo = eb.getInt(16) & 0xFFFFFFFFL;
-
-                    ByteBuffer hb = ByteBuffer.allocate(46).order(ByteOrder.LITTLE_ENDIAN);
-                    long co = cdo;
-                    long e_o = cdo + cds;
-                    while (co < e_o) {
-                        hb.clear();
-                        ch.read(hb, co);
-                        hb.flip();
-                        if (hb.remaining() < 46 || hb.getInt() != 0x02014b50) {
-                            break;
-                        }
-
-                        long co_c = co + 16;
-                        hb.position(16);
-                        int c = hb.getInt();
-
-                        hb.position(28);
-                        int nl = hb.getShort() & 0xFFFF;
-                        int el = hb.getShort() & 0xFFFF;
-                        int cl = hb.getShort() & 0xFFFF;
-
-                        hb.position(42);
-                        long lho = hb.getInt() & 0xFFFFFFFFL;
-
-                        byte[] nb = new byte[nl];
-                        ByteBuffer nbf = ByteBuffer.wrap(nb);
-                        ch.read(nbf, co + 46);
-                        String n = new String(nb, StandardCharsets.UTF_8);
-
-                        if (n.startsWith("classes") && n.endsWith(".dex")) {
-                            ByteBuffer lhb = ByteBuffer.allocate(30).order(ByteOrder.LITTLE_ENDIAN);
-                            ch.read(lhb, lho);
-                            lhb.flip();
-                            if (lhb.remaining() >= 30 && lhb.getInt() == 0x04034b50) {
-                                cur.put(n, new long[]{co_c, lho + 14, (long) c});
-                            }
-                        }
-
-                        co += 46L + nl + el + cl;
-                    }
-                }
+        try {
+            long endOfCentralDirectory = findEndOfCentralDirectory(file);
+            if (endOfCentralDirectory < 0) {
+                return dexInfoMap;
             }
-        }
 
-        if (s_es.isEmpty() || t_es.isEmpty()) {
-            System.out.println("[CRC] No dex files found in apk");
+            file.seek(endOfCentralDirectory + Directory.CENTRAL_DIRECTORY_SIZE.offset);
+            long centralDirectorySize = unsignedInt(readIntLE(file));
+
+            file.seek(endOfCentralDirectory + Directory.CENTRAL_DIRECTORY_OFFSET.offset);
+            long centralDirectoryOffset = unsignedInt(readIntLE(file));
+
+            long headerPosition = centralDirectoryOffset;
+            long centralDirectoryEnd = centralDirectoryOffset + centralDirectorySize;
+
+            while (headerPosition < centralDirectoryEnd) {
+                file.seek(headerPosition);
+
+                if (readIntLE(file) != ZipSignature.CENTRAL_DIRECTORY_HEADER.value) {
+                    break;
+                }
+                file.seek(headerPosition + DHeader.CRC32_OFFSET.offset);
+                long crc32Value = unsignedInt(readIntLE(file));
+
+                file.seek(headerPosition + DHeader.FILE_NAME_LENGTH.offset);
+                int fileNameLength = readShortLE(file);
+
+                file.seek(headerPosition + DHeader.EXTRA_FIELD_LENGTH.offset);
+                int extraFieldLength = readShortLE(file);
+
+                file.seek(headerPosition + DHeader.COMMENT_LENGTH.offset);
+                int commentLength = readShortLE(file);
+
+                file.seek(headerPosition + DHeader.LOCAL_HEADER_OFFSET.offset);
+                long localHeaderOffset = unsignedInt(readIntLE(file));
+
+                byte[] fileNameBytes = new byte[fileNameLength];
+                file.seek(headerPosition + DHeader.HEADER_SIZE.offset);
+                file.readFully(fileNameBytes);
+
+                String fileName = new String(fileNameBytes, "UTF-8");
+
+                if (fileName.startsWith("classes") && fileName.endsWith(".dex")) {
+
+                    long[] info = new long[3];
+                    info[0] = headerPosition + DHeader.CRC32_OFFSET.offset;
+                    info[1] = localHeaderOffset + TFileHeader.CRC32_OFFSET.offset;
+                    info[2] = crc32Value;
+                    dexInfoMap.put(fileName, info);
+
+                }
+                headerPosition = headerPosition + DHeader.HEADER_SIZE.offset + fileNameLength + extraFieldLength + commentLength;
+            }
+        } finally {
+            file.close();
+        }
+        return dexInfoMap;
+    }
+
+    public static void patch(File sourceApk, File targetApk) throws IOException {
+        Map<String, long[]> sourceDexInfo = readDexCrcInfo(sourceApk);
+        Map<String, long[]> targetDexInfo = readDexCrcInfo(targetApk);
+
+        if (sourceDexInfo.isEmpty() || targetDexInfo.isEmpty()) {
+            System.out.println("[CRC] No dex files found");
             return;
         }
 
-        boolean mod = false;
-        try (RandomAccessFile rf = new RandomAccessFile(t_a, "rw");
-             FileChannel ch = rf.getChannel()) {
-            
-            ByteBuffer b = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-            
-            Iterator<Map.Entry<String, long[]>> it = s_es.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, long[]> e = it.next();
+        RandomAccessFile targetFile = new RandomAccessFile(targetApk, "rw");
+        boolean patched = false;
 
-                long[] se = e.getValue();
-                long[] te = t_es.get(e.getKey());
-                if (te != null && te[2] != se[2]) {
-                    int n_c = (int) se[2];
-                    b.clear();
-                    b.putInt(n_c);
-                    b.flip();
-                    ch.write(b, te[0]);
-                    b.clear();
-                    b.putInt(n_c);
-                    b.flip();
-                    ch.write(b, te[1]);
-                    
-                    mod = true;
+        try {
+            Iterator<String> it = sourceDexInfo.keySet().iterator();
+            while (it.hasNext()) {
+                String dexName = it.next();
+                long[] sourceInfo = sourceDexInfo.get(dexName);
+                long[] targetInfo = targetDexInfo.get(dexName);
+
+                if (targetInfo != null && targetInfo[2] != sourceInfo[2]) {
+                    int newCrc32 = (int) sourceInfo[2];
+
+                    targetFile.seek(targetInfo[0]);
+                    writeIntLE(targetFile, newCrc32);
+
+                    targetFile.seek(targetInfo[1]);
+                    writeIntLE(targetFile, newCrc32);
+
+                    patched = true;
+                    System.out.println("[CRC] Patched: " + dexName);
                 }
             }
-            
-            if (mod) {
-                ch.force(true);
-                System.out.println("[CRC] Patched dex CRC values from merged APK");
-            }
+        } finally {
+            targetFile.close();
+        }
+
+        if (patched) {
+            System.out.println("[CRC] Patched dex CRC values from source APK");
         }
     }
 }

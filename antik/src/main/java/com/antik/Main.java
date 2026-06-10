@@ -1,5 +1,6 @@
 package com.antik;
 
+import com.antik.DexPatcher.DexPatcher;
 import com.antik.crc32.crc32;
 import com.antik.manifest.manifestP;
 import com.antik.ui.*;
@@ -131,7 +132,6 @@ public class Main {
             } catch (Exception e) {
                 System.err.println("[ERROR] Patching failed: " + e.getMessage());
             }
-            
 
             System.out.println("[BUILD] Building APK...");
             Sp_T.writeApk(Pai_Dir);
