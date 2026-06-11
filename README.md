@@ -1,27 +1,27 @@
 <img src="preview/re.png" width = "100" height = "100" alt="LOGO"/>
-# LibGrabber
+# RePairip
 
-LibGrabber 1.0 is an Android tool designed to Dump lib sdk  || External Working...!
+RePairip 1.4.14 this google Google加固 ReverseTools  this tools badsilcay Reverse VMRunner code ok & repack it's dumping is dynamic & transaltion is statsic by the way  this tools is working almsot all pairip app if you see any bug thne make sure create new issues & any develoepr can contibute this projetc it's OpneSource 
 
 ## How It Works
 
 logic from the following open-source repositories:
 
-- [Efl C++](https://github.com/Enlightenment/efl)
+- [JesusFreke](https://github.com/JesusFreke/smali)
 ---
 
 ## Overview
 
-LibGrabber is a powerful Android application designed to parse, analyze, and dump symbol tables from shared object .so files. It extracts function names, variable names, and other exported symbols from native libraries, generating comprehensive C++ header files for reverse engineering, analysis, and development purposes
 
 
-| <img src="app/src/main/ic_launcher-playstore.png" width = "30" height = "30" alt="LOGO"/> | [LibGrabber](https://github.com/ispointer/LibGrabber) |
+
+| <img src="preview/re.png" width = "30" height = "30" alt="LOGO"/> | [RePairip](https://github.com/ispointer/RePairip) |
 |-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
 
 ## Screenshots
 | App UI                                                                 | Dump Style                                                                    |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| ![App UI](images/im1.jpg) | ![Dump Style](images/im2.jpg) |
+| ![App UI](preview/a1.jpg) | ![Dump Style](preview/a2.jpg) |
 
 ## License
 
