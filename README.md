@@ -5,7 +5,7 @@
 <h1 align="center">RePairip</h1>
 
 <p align="center">
-  A Java reverse-engineering utility for analyzing and rebuilding Android APK/APKS packages that use Google Play PairIP protection.
+  A Java reverse engineering utility for analyzing and rebuilding Android APK/APKS packages that use Google Play Google加固 protection.
 </p>
 
 <p align="center">
