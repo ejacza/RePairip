@@ -78,8 +78,8 @@ public class Main {
                 mergedApkFile = new File(output.get_out(inputApk, name));
 
                 System.out.println("[BUILD] Writing merged APK...");
-                writeWithProgress(module, mergedApkFile);
-                System.out.println("\n[MERGE] APK merged successfully: " + mergedApkFile.getAbsolutePath());
+                loading.progress(module, mergedApkFile);
+                System.out.println("[MERGE] APK merged successfully: " + mergedApkFile.getAbsolutePath());
             }
 
             if (translatePath != null) {
@@ -94,7 +94,7 @@ public class Main {
                     File transFile = new File(output.get_out(inputApk, tn));
 
                     System.out.println("[BUILD] Building Translated APK...");
-                    writeSilently(module, transFile);
+                    output.write(module, transFile);
                     System.out.println("[BUILD] Translated APK built at: " + transFile.getAbsolutePath());
                 } else {
                     System.err.println("[ERROR] Translation file not found: " + translatePath);
@@ -114,7 +114,7 @@ public class Main {
                 File paiFile = new File(output.get_out(inputApk, pn));
 
                 System.out.println("[BUILD] Building Logging APK...");
-                writeSilently(module, paiFile);
+                output.write(module, paiFile);
                 crc32.patch(mergedApkFile, paiFile);
                 System.out.println("[BUILD] Logging APK built at: " + paiFile.getAbsolutePath());
             }
@@ -129,30 +129,5 @@ public class Main {
                 deleteDir.del_dir(tempDir);
             }
         }
-    }
-
-    private static void writeWithProgress(ApkModule module, File file) throws IOException {
-        int total = module.getZipEntryMap().size();
-        if (module.hasTableBlock()) {
-            total--;
-        }
-        int[] count = {0};
-        final int finalTotal = total;
-        module.writeApk(file, new WriteProgress() {
-            @Override
-            public void onCompressFile(String path, int method, long length) {
-                count[0]++;
-                loading.progress(count[0], finalTotal);
-            }
-        });
-        loading.progress(finalTotal, finalTotal);
-    }
-
-    private static void writeSilently(ApkModule module, File file) throws IOException {
-        module.writeApk(file, new WriteProgress() {
-            @Override
-            public void onCompressFile(String path, int method, long length) {
-            }
-        });
     }
 }
