@@ -21,9 +21,7 @@ RePairip is a command-line tool that works with PairIP-protected Android package
 
 ## Tutorial
 
-[▶ Watch Video on Telegram](https://t.me/RevDex/557)
-
-## Tutorial <table align="center"> <tr> <td align="center" width="300"> <b>TreeView</b><br> <video src="https://revdex.re/input.mp4" width="100%" height="600" controls></video> </td> </tr> </table>
+[>> Watch Tutorial](https://revdex.re/input.mp4)
 
 
 | App UI | Dump Style |
