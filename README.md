@@ -5,7 +5,7 @@
 <h1 align="center">RePairip</h1>
 
 <p align="center">
-  A Java reverse engineering utility for analyzing and rebuilding Android APK/APKS packages that use Google Play Google加固 protection.
+  RePairip is a Google加固 reverse engineering tool that can dump all VMRunner snapshots and fully repack Android applications, removing protection layers completely
 </p>
 
 <p align="center">
@@ -14,10 +14,6 @@
   <b>Build:</b> Gradle + Shadow Jar
 </p>
 
-
-## Overview
-
-RePairip is a command-line tool that works with PairIP-protected Android packages. It can merge split `.apks` packages, patch PairIP-related dex code, clean split metadata from the manifest, rebuild the APK, and optionally apply a static translation JSON to restore dumped PairIP values
 
 ## Tutorial
 
