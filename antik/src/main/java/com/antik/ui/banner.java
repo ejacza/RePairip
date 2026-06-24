@@ -8,7 +8,7 @@ public class banner {
         System.out.println("░█▀▄░█▀▀░█▀█░█▀█░▀█▀░█▀▄░▀█▀░█▀█░");
         System.out.println("░█▀▄░█▀▀░█▀▀░█▀█░░█░░█▀▄░░█░░█▀▀░");
         System.out.println("░▀░▀░▀▀▀░▀░░░▀░▀░▀▀▀░▀░▀░▀▀▀░▀░░░");
-        System.out.println("Version : 1.3.10");
+        System.out.println("Version : 1.5.20");
         System.out.println("--------------------------------------");
         System.out.println("Dev     : Antik");
         System.out.println("Channel : https://t.me/RevDex");
