@@ -92,10 +92,10 @@ object Dumper {
         var passBytes = 0L; var workBytes = 0L; var headerBytes = 64L
         val sources = module.zipEntryMap.toArray(true)
         for (s in sources) {
-            headerBytes += 92 + (s.alias.toByteArray(StandardCharsets.UTF_8).size * 2L)
+            headerBytes += 92 + ((s.alias?.toByteArray(StandardCharsets.UTF_8)?.size ?: 0) * 2L)
             val old = when (s) {
                 is ArchiveFileEntrySource -> s
-                is RenamedInputSource -> s.getParentInputSource(ArchiveFileEntrySource::class.java)
+                is RenamedInputSource<*> -> s.getParentInputSource(ArchiveFileEntrySource::class.java)
                 else -> null
             }
             val len = maxOf(0L, s.length)
