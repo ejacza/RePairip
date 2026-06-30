@@ -9,6 +9,25 @@ object PairipDetector {
     fun isPairip(apkPath: String): Boolean {
         val f = File(apkPath)
         if (!f.exists()) return false
+        return scanApkZip(f)
+    }
+
+    fun isPairip(sourceDir: String, splitDirs: Array<String>?, nativeLibDir: String?): Boolean {
+        if (scanApkZip(File(sourceDir))) return true
+        if (splitDirs != null) {
+            for (s in splitDirs) {
+                if (scanApkZip(File(s))) return true
+            }
+        }
+        if (nativeLibDir != null) {
+            val libf = File(nativeLibDir, "libpairipcore.so")
+            if (libf.exists()) return true
+        }
+        return false
+    }
+
+    private fun scanApkZip(f: File): Boolean {
+        if (!f.exists()) return false
         return try {
             ZipFile(f).use { zip ->
                 val entries = zip.entries()
@@ -26,7 +45,7 @@ object PairipDetector {
                     }
                 }
 
-                if (!hasCoreLib) return@use false
+                if (!hasCoreLib && assets.isEmpty()) return@use false
 
                 // confirm via asset header
                 for (an in assets) {
@@ -40,7 +59,7 @@ object PairipDetector {
                     } catch (_: Exception) { }
                 }
 
-                // if no asset match but core lib found, check DEX for PairIP classes
+                // check DEX for PairIP classes
                 val dexEntries = zip.entries().asSequence().filter { it.name.startsWith("classes") && it.name.endsWith(".dex") }.take(2).toList()
                 for (de in dexEntries) {
                     try {

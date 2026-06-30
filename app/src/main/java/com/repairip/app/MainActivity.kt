@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun scan() {
-        tvStatus.text = "Scanning installed apps..."
+        tvStatus.text = "Scanning for PairIP..."
         scope.launch {
             val apps = withContext(Dispatchers.IO) {
                 val pm = packageManager
@@ -83,22 +83,18 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val name = pm.getApplicationLabel(ai).toString()
                         val icon = pm.getApplicationIcon(ai)
-                        val hasPP = PairipDetector.isPairip(ai.sourceDir)
-                        AppInfo(ai.packageName, name, icon, ai.sourceDir, hasPP)
+                        val hasPP = PairipDetector.isPairip(ai.sourceDir, ai.splitSourceDirs, ai.nativeLibraryDir)
+                        if (!hasPP) return@mapNotNull null
+                        AppInfo(ai.packageName, name, icon, ai.sourceDir, true)
                     } catch (_: Exception) { null }
-                }.sortedByDescending { it.hasPairIP }
+                }
             }
             adapter.update(apps)
-            val cnt = apps.count { it.hasPairIP }
-            tvStatus.text = "${apps.size} apps · $cnt with PairIP"
+            tvStatus.text = "${apps.size} PairIP apps found"
         }
     }
 
     private fun onAppTap(app: AppInfo) {
-        if (!app.hasPairIP) {
-            Toast.makeText(this, "No PairIP detected", Toast.LENGTH_SHORT).show()
-            return
-        }
         val dir = File(Environment.getExternalStorageDirectory(), "RePairip/${app.pkg}")
         if (dir.exists() && dir.listFiles()?.any { it.name.endsWith(".apk") } == true) {
             AlertDialog.Builder(this)
