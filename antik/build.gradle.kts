@@ -9,10 +9,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-tasks.jar {
-    enabled = false
-}
-
 tasks.shadowJar {
     archiveFileName.set("RePairip.jar")
     manifest {
