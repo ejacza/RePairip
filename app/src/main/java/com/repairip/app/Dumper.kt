@@ -36,11 +36,14 @@ object Dumper {
         val (module, originalFile) = if (isSplit) {
             val tmpDir = createTempDir("rmg_")
             try {
-                com.antik.AntikUtils.ex_apks(input, tmpDir)
-                // also copy any split APKs from installed app
-                splits?.forEach { sp ->
-                    val sf = File(sp)
-                    if (sf.exists()) sf.copyTo(File(tmpDir, sf.name), overwrite = true)
+                if (apkPath.endsWith(".apks") || apkPath.endsWith(".xapk")) {
+                    com.antik.AntikUtils.ex_apks(input, tmpDir)
+                } else {
+                    // installed app with splits: copy base + split APKs
+                    input.copyTo(File(tmpDir, "base.apk"), overwrite = true)
+                    splits?.forEach { sp ->
+                        File(sp).copyTo(File(tmpDir, File(sp).name), overwrite = true)
+                    }
                 }
                 val bundle = ApkBundle()
                 bundle.loadApkDirectory(tmpDir)
