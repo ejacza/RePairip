@@ -7,5 +7,6 @@ data class AppInfo(
     val name: String,
     val icon: Drawable?,
     val sourceDir: String,
-    var hasPairIP: Boolean = false
+    val hasPairIP: Boolean = false,
+    val splitDirs: Array<String>? = null
 )
