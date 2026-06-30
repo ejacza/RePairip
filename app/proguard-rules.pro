@@ -1,0 +1,3 @@
+-keep class com.antik.** { *; }
+-keep class com.reandroid.** { *; }
+-keep class org.jf.** { *; }

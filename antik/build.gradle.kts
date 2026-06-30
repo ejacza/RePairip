@@ -1,5 +1,6 @@
 plugins {
     java
+    `java-library`
     alias(libs.plugins.shadow)
 }
 
@@ -19,13 +20,12 @@ tasks.shadowJar {
     }
 }
 
-// Make the 'build' and 'assemble' tasks produce the shadow jar
 tasks.assemble {
     dependsOn(tasks.shadowJar)
 }
 
 dependencies {
-    implementation(libs.dexlib2)
-    implementation(libs.reandroid.arsclib)
+    api(libs.dexlib2)
+    api(libs.reandroid.arsclib)
     implementation(libs.guava)
 }

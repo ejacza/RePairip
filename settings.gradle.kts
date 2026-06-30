@@ -25,4 +25,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RePairip"
 include(":antik")
-
+include(":app")
