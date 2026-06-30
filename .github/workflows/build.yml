@@ -20,6 +20,10 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
+      - name: Install Android SDK 35
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-35" 2>/dev/null || true
+
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug
 
